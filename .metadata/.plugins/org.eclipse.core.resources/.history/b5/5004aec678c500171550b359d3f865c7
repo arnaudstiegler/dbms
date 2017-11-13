@@ -1,0 +1,39 @@
+package edu.polytechnique.inf553;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Given a number of tracks and a country name, find all releases in this
+ * country that have more tracks than the input number. Return the id of the
+ * release, sorted in ascending order.
+ */
+@WebServlet(urlPatterns = { "/Q5" }, initParams = {
+		@WebInitParam(name = "number", value = "", description = "The number of tracks"),
+		@WebInitParam(name = "countryname", value = "", description = "The country name") })
+public final class Q5Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q5Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Enter your code here
+	}
+
+}

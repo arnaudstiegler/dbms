@@ -1,0 +1,41 @@
+package edu.polytechnique.inf553;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Given the name of an artist and a time range (i.e.,two dates), find all the
+ * releases in this range where he/she was the main contributor. Return the id
+ * and the name of the release, sorted by the release date in ascending order.
+ * (Do not consider incomplete dates.)
+ */
+@WebServlet(urlPatterns = { "/Q4" }, initParams = {
+		@WebInitParam(name = "name", value = "", description = "The name of an artist"),
+		@WebInitParam(name = "startDate", value = "", description = "The start date of a release"),
+		@WebInitParam(name = "endDate", value = "", description = "The end date of a release") })
+public final class Q4Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q4Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Enter your code here
+	}
+
+}

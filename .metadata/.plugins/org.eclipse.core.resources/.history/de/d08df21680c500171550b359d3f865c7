@@ -1,0 +1,38 @@
+package edu.polytechnique.inf553;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Given a release status name, find all releases for which the country and
+ * release date information are unknown. Return their names sorted in ascending
+ * order.
+ */
+@WebServlet(urlPatterns = { "/Q6" }, initParams = {
+		@WebInitParam(name = "status", value = "", description = "The status name of a release") })
+public final class Q6Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q6Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Enter your code here
+	}
+
+}

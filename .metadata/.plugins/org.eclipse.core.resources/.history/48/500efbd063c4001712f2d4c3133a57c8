@@ -1,0 +1,64 @@
+package edu.polytechnique.inf553;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.text.StringEscapeUtils;
+
+/**
+ * Given the name of a country, find the names of all artists who were born in
+ * this country, and return them sorted in ascending order.
+ */
+@WebServlet(urlPatterns = { "/Q1" }, initParams = {
+		@WebInitParam(name = "countryname", value = "", description = "The name of a country") })
+public final class Q1Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q1Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		response.setContentType("application/xml;charset=UTF-8");
+		String name = request.getParameter("studentname");
+		String split[] = name.split("\\.");
+		response.getWriter().append("<result>");
+		if (split.length != 2) {
+			response.getWriter().append("The specified name must be of the form firstname.lastname");
+		} else {
+			response.getWriter().append("<row>");
+			response.getWriter().append("<firstname>");
+			response.getWriter().append(StringEscapeUtils.escapeXml11(split[0]));
+			response.getWriter().append("</firstname>");
+			response.getWriter().append("<lastname>");
+			response.getWriter().append(StringEscapeUtils.escapeXml11(split[1]));
+			response.getWriter().append("</lastname>");
+			response.getWriter().append("</row>");
+		}
+		response.getWriter().append("</result>");
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

@@ -1,0 +1,106 @@
+package edu.polytechnique.inf553;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.text.StringEscapeUtils;
+
+/**
+ * Given the id of an artist, find all the artists that he/she collaborated with
+ * in some release. Return the names of the collaborators sorted in ascending
+ * order.
+ */
+@WebServlet(urlPatterns = { "/Q7" }, initParams = {
+		@WebInitParam(name = "id", value = "", description = "The id of an artist") })
+public final class Q7Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q7Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Connection connection = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			String host = "localhost";
+			String dbName = "arnaudstiegler";
+			int port = 5432;
+			String serverURL = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
+			String userName = "arnaudstiegler";
+			String password = "mypass";
+			connection = DriverManager.getConnection(serverURL, userName, password);
+
+			DatabaseMetaData dmd = connection.getMetaData();
+			String serverName = dmd.getDatabaseProductName();
+			String productVersion = dmd.getDatabaseProductVersion();
+
+			int artist = Integer.parseInt(request.getParameter("id"));
+
+			// STEP 4: Execute a query
+			System.out.println("Creating statement...");
+
+			PreparedStatement stat = connection.prepareStatement(
+					"SELECT DISTINCT artist.name FROM release_has_artist r INNER JOIN artist ON r.artist=artist.id WHERE r.artist !=? AND r.release IN (SELECT release_has_artist.release FROM release_has_artist WHERE release_has_artist.artist =?) ORDER BY artist.name ASC;");
+			stat.setInt(1, artist);
+			stat.setInt(2, artist);
+			ResultSet rs = stat.executeQuery();
+
+			response.setContentType("text/xml;charset=UTF-8");
+			PrintWriter writer = response.getWriter();
+			writer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			writer.append("<result>");
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				String name = rs.getString("name");
+				// Display values
+				writer.append("<row>");
+				writer.append("<name>");
+				writer.append(StringEscapeUtils.escapeXml11(name));
+				writer.append("</name>");
+				writer.append("</row>");
+
+			}
+			response.getWriter().append("</result>");
+		} catch (ClassNotFoundException e) {
+			System.out.println("Driver not found!");
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (connection != null)
+					connection.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+	}
+
+}

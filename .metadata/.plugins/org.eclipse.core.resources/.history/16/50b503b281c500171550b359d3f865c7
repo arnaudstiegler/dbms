@@ -1,0 +1,110 @@
+package edu.polytechnique.inf553;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.text.StringEscapeUtils;
+
+/**
+ * Given a release status name, find all releases for which the country and
+ * release date information are unknown. Return their names sorted in ascending
+ * order.
+ */
+@WebServlet(urlPatterns = { "/Q6" }, initParams = {
+		@WebInitParam(name = "status", value = "", description = "The status name of a release") })
+public final class Q6Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q6Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Connection connection = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			String host = "localhost";
+			String dbName = "arnaudstiegler";
+			int port = 5432;
+			String serverURL = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
+			String userName = "arnaudstiegler";
+			String password = "mypass";
+			connection = DriverManager.getConnection(serverURL, userName, password);
+
+			DatabaseMetaData dmd = connection.getMetaData();
+			String serverName = dmd.getDatabaseProductName();
+			String productVersion = dmd.getDatabaseProductVersion();
+
+			String countryname = "France";
+			int number = 5;
+
+			// STEP 4: Execute a query
+			System.out.println("Creating statement...");
+			Statement stmt = connection.createStatement();
+			String sql;
+			sql = "SELECT release.title FROM release FULL JOIN release_country  ON release_country.release=release.id "
+					+ "INNER JOIN release_status ON release_status.id=release.status " + "WHERE"
+					+ "release_country.year IS NULL AND release_country.month IS NULL AND release_country.day IS NULL AND release_country.country IS NULL;";
+			ResultSet rs = stmt.executeQuery(sql);
+
+			response.setContentType("text/xml;charset=UTF-8");
+			PrintWriter writer = response.getWriter();
+			writer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			writer.append("<result>");
+
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				String title = rs.getString("release.title");
+
+				// Display values
+				writer.append("<row>");
+				writer.append("<title>");
+				writer.append(StringEscapeUtils.escapeXml11(title));
+				writer.append("</title>");
+				writer.append("</row>");
+
+			}
+			writer.append("</result>");
+
+		} catch (ClassNotFoundException e) {
+			System.out.println("Driver not found!");
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (connection != null)
+					connection.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+	}
+
+}

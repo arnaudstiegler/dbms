@@ -1,0 +1,106 @@
+package edu.polytechnique.inf553;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.text.StringEscapeUtils;
+
+/**
+ * Given a gender, an artist type, and a birth year, find all corresponding
+ * artists, and return their ids in ascending order.
+ */
+@WebServlet(urlPatterns = { "/Q3" }, initParams = {
+		@WebInitParam(name = "gender", value = "", description = "The gender of an artist"),
+		@WebInitParam(name = "type", value = "", description = "The type of an artist"),
+		@WebInitParam(name = "birthyear", value = "", description = "The birthyear of an artist") })
+public final class Q3Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q3Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Connection connection = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			String host = "localhost";
+			String dbName = "arnaudstiegler";
+			int port = 5432;
+			String serverURL = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
+			String userName = "arnaudstiegler";
+			String password = "mypass";
+			connection = DriverManager.getConnection(serverURL, userName, password);
+
+			DatabaseMetaData dmd = connection.getMetaData();
+			String serverName = dmd.getDatabaseProductName();
+			String productVersion = dmd.getDatabaseProductVersion();
+
+			String gender = "Male";
+			String type = "Person";
+			int birthYear = 2017;
+
+			// STEP 4: Execute a query
+			System.out.println("Creating statement...");
+			Statement stmt = connection.createStatement();
+			String sql;
+			sql = "SELECT a.id FROM artist a, country c, artist_type t, gender g WHERE t.type=" + type + " AND a.syear=" + birthYear
+					+ " AND g.name=" + gender + " AND a.gender = g.id AND t.id=a.type  LIMIT 5;";
+			ResultSet rs = stmt.executeQuery(sql);
+
+			response.getWriter().append("<result>");
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				int id = rs.getInt("id");
+
+				// Display values
+				response.getWriter().append("</br>");
+				response.getWriter().append("<row>");
+				response.getWriter().append("<name>");
+				response.getWriter().append(StringEscapeUtils.escapeXml11(Integer.toString(id)));
+				response.getWriter().append("</name>");
+				response.getWriter().append("</row>");
+
+			}
+			response.getWriter().append("</result>");
+		} catch (ClassNotFoundException e) {
+			System.out.println("Driver not found!");
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (connection != null)
+					connection.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+	}
+
+}

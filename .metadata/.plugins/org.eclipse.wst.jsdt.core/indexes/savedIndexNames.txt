@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+/Users/arnaudstiegler/Desktop/3A/DBMS/dir/phaseIII-workspace/.metadata/.plugins/org.eclipse.wst.jsdt.core/indexes
+562650704.index
+4099682438.index
+225254153.index
+2846658602.index
+197627685.index
+311350088.index

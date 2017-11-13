@@ -1,0 +1,98 @@
+package edu.polytechnique.inf553;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.text.StringEscapeUtils;
+
+/**
+ * Given the name of a country, find the names of all artists who were born in
+ * this country, and return them sorted in ascending order.
+ */
+@WebServlet(urlPatterns = { "/Q1" }, initParams = {
+		@WebInitParam(name = "countryname", value = "", description = "The name of a country") })
+public final class Q1Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q1Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+
+		Connection connection = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			String host = "localhost";
+			String dbName = "arnaudstiegler";
+			int port = 5432;
+			String serverURL = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
+			String userName = "arnaudstiegler";
+			String password = "mypass";
+			connection = DriverManager.getConnection(serverURL, userName, password);
+
+			DatabaseMetaData dmd = connection.getMetaData();
+			String serverName = dmd.getDatabaseProductName();
+			String productVersion = dmd.getDatabaseProductVersion();
+
+			String countryname = "Argentina";
+
+			// STEP 4: Execute a query
+			System.out.println("Creating statement...");
+			Statement stmt = connection.createStatement();
+			String sql;
+			sql = "SELECT a.name FROM artist a, country c WHERE c.name='" + countryname + "' and c.id=a.area LIMIT 5;";
+			ResultSet rs = stmt.executeQuery(sql);
+
+			response.getWriter().append("<result>");
+			response.getWriter().append(StringEscapeUtils.escapeXml11(""));
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				String name = rs.getString("name");
+
+				// Display values
+				response.getWriter().append("<row>");
+				response.getWriter().append("<name>");
+				response.getWriter().append(name);
+				response.getWriter().append("</name>");
+				response.getWriter().append("</row>");
+
+			}
+			response.getWriter().append("</result>");
+		} catch (ClassNotFoundException e) {
+			System.out.println("Driver not found!");
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (connection != null)
+					connection.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+	}
+}

@@ -1,0 +1,44 @@
+package edu.polytechnique.inf553;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.text.StringEscapeUtils;
+
+/**
+ * Given the name of a country, find the names of all artists who were born in
+ * this country, and return them sorted in ascending order.
+ */
+@WebServlet(urlPatterns = { "/Q1" }, initParams = {
+		@WebInitParam(name = "countryname", value = "", description = "The name of a country") })
+public final class Q1Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Q1Servlet() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+		try{
+			Class.forName("org.postgresql.Driver");
+			}
+			catch { ClassNotFoundException e ;} {
+			System.out.println("Driver not found!");
+			} 
+			
+	}
+
+}
